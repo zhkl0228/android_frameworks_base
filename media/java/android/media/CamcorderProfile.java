@@ -90,9 +90,18 @@ public class CamcorderProfile
      */
     public static final int QUALITY_QVGA = 7;
 
+    // psw0523 add
+    public static final int QUALITY_UXGA = 8;
+    public static final int QUALITY_VGA  = 9;
+    public static final int QUALITY_SVGA  = 10;
+    // end of psw0523
+
     // Start and end of quality list
     private static final int QUALITY_LIST_START = QUALITY_LOW;
-    private static final int QUALITY_LIST_END = QUALITY_QVGA;
+    // psw0523 fix
+    //private static final int QUALITY_LIST_END = QUALITY_QVGA;
+    private static final int QUALITY_LIST_END = QUALITY_SVGA;
+    // end of psw0523
 
     /**
      * Time lapse quality level corresponding to the lowest available resolution.
@@ -134,9 +143,18 @@ public class CamcorderProfile
      */
     public static final int QUALITY_TIME_LAPSE_QVGA = 1007;
 
+    // psw0523 add
+    public static final int QUALITY_TIME_LAPSE_UXGA = 1008;
+    public static final int QUALITY_TIME_LAPSE_VGA  = 1009;
+    public static final int QUALITY_TIME_LAPSE_SVGA  = 1010;
+    // end of psw0523
+
     // Start and end of timelapse quality list
     private static final int QUALITY_TIME_LAPSE_LIST_START = QUALITY_TIME_LAPSE_LOW;
-    private static final int QUALITY_TIME_LAPSE_LIST_END = QUALITY_TIME_LAPSE_QVGA;
+    // psw0523 fix
+    //private static final int QUALITY_TIME_LAPSE_LIST_END = QUALITY_TIME_LAPSE_QVGA;
+    private static final int QUALITY_TIME_LAPSE_LIST_END = QUALITY_TIME_LAPSE_SVGA;
+    // end of psw0523
 
     /**
      * Default recording duration in seconds before the session is terminated.

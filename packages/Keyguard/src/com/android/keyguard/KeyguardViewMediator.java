@@ -189,7 +189,7 @@ public class KeyguardViewMediator {
     /**
      * External apps (like the phone app) can tell us to disable the keygaurd.
      */
-    private boolean mExternallyEnabled = true;
+    private boolean mExternallyEnabled = false;//lockey
 
     /**
      * Remember if an external call to {@link #setKeyguardEnabled} with value

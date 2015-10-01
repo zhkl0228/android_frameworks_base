@@ -44,6 +44,11 @@ import android.util.Log;
 import android.util.Slog;
 import android.view.WindowManager;
 
+// psw0523 add for nexell hwc property
+import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
+// end psw0523
+
 import com.android.internal.R;
 import com.android.internal.os.BinderInternal;
 import com.android.internal.os.SamplingProfilerIntegration;
@@ -770,7 +775,7 @@ class ServerThread {
                 }
             }
 
-            if (!disableNonCoreServices && 
+            if (!disableNonCoreServices &&
                 context.getResources().getBoolean(R.bool.config_dreamsSupported)) {
                 try {
                     Slog.i(TAG, "Dreams Service");
@@ -1090,8 +1095,38 @@ class ServerThread {
             Slog.i(TAG, "Enabled StrictMode for system server main thread.");
         }
 
+        // psw0523 add for nexell hwc property
+        setNexellProperty(contextF);
+
         Looper.loop();
         Slog.d(TAG, "System ServerThread is exiting!");
+    }
+
+    // psw0523 add for nexell hwc property
+    static final void setNexellProperty(Context context) {
+        try {
+            int hwcScale = Settings.System.getInt(context.getContentResolver(), "hwc.scale", 3);
+            Slog.i(TAG, "hwc.scale is " + hwcScale);
+            SystemProperties.set("hwc.scale", Integer.toString(hwcScale));
+        } catch (Throwable e) {
+            Slog.i(TAG, "failed to getInt hwc.scale setting value");
+        }
+
+        try {
+            int hwcResolution = Settings.System.getInt(context.getContentResolver(), "hwc.resolution", 18);
+            Slog.i(TAG, "hwc.resolution is " + hwcResolution);
+            SystemProperties.set("hwc.resolution", Integer.toString(hwcResolution));
+        } catch (Throwable e) {
+            Slog.i(TAG, "failed to getInt hwc.resolution setting value");
+        }
+
+        try {
+            int hwcHDMIScreenDownSizing = Settings.System.getInt(context.getContentResolver(), "hwc.screendownsizing", 0);
+            Slog.i(TAG, "hwc.screendownsizing is " + hwcHDMIScreenDownSizing);
+            SystemProperties.set("hwc.screendownsizing", Integer.toString(hwcHDMIScreenDownSizing));
+        } catch (Throwable e) {
+            Slog.i(TAG, "failed to getInt hwc.screendownsizing setting value");
+        }
     }
 
     static final void startSystemUi(Context context) {

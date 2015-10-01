@@ -1787,7 +1787,13 @@ public class LocationManagerService extends ILocationManager.Stub {
         try {
             synchronized (mLock) {
                 LocationProviderInterface p = mProvidersByName.get(provider);
-                if (p == null) return false;
+                if (p == null) {
+                    // psw0523 fix for cts android.location.cts.LocationManagerTest
+                    return false; // this is org
+                    // if GMS, android booting fail....
+                    //ContentResolver resolver = mContext.getContentResolver();
+                    //return Settings.Secure.isLocationProviderEnabled(resolver, provider);
+                }
 
                 return isAllowedByUserSettingsLocked(provider, uid);
             }

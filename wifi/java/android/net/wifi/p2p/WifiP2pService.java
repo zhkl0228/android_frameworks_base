@@ -1888,6 +1888,10 @@ public class WifiP2pService extends IWifiP2pManager.Stub {
                     }
                     break;
                 case WifiMonitor.P2P_PROV_DISC_PBC_REQ_EVENT:
+                    // sapark
+                    // already connected device 
+                    loge("##### (sapark) ignore connection ?");
+                    break;
                 case WifiMonitor.P2P_PROV_DISC_ENTER_PIN_EVENT:
                 case WifiMonitor.P2P_PROV_DISC_SHOW_PIN_EVENT:
                     WifiP2pProvDiscEvent provDisc = (WifiP2pProvDiscEvent) message.obj;

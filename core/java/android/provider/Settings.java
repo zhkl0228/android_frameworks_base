@@ -5350,6 +5350,19 @@ public final class Settings {
        public static final String WIFI_REENABLE_DELAY_MS = "wifi_reenable_delay";
 
        /**
+        * Whether the Ethernet should be on and its configurations.
+        */
+       public static final String ETH_ON      = "eth_on";
+       public static final String ETH_MODE    = "eth_mode";
+       public static final String ETH_IP      = "eth_ip";
+       public static final String ETH_MASK    = "eth_mask";
+       public static final String ETH_DNS     = "eth_dns";
+       public static final String ETH_ROUTE   = "eth_route";
+       public static final String ETH_CONF    = "eth_conf";
+       public static final String ETH_IFNAME  = "eth_ifname";
+       public static final String ETH_KEEP    = "eth_always_on";
+
+       /**
         * The number of milliseconds to delay when checking for data stalls during
         * non-aggressive detection. (screen is turned off.)
         * @hide

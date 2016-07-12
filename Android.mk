@@ -15,6 +15,12 @@
 #
 LOCAL_PATH := $(call my-dir)
 
+# Hack: add dirs for Ethernet
+SUBDIR_ETHERNET := $(addsuffix /java, ethernet)
+FRAMEWORKS_BASE_SUBDIRS += ${SUBDIR_ETHERNET}
+FRAMEWORKS_BASE_JAVA_SRC_DIRS += \
+    $(addprefix frameworks/base/, ${SUBDIR_ETHERNET})
+
 # We have a special case here where we build the library's resources
 # independently from its code, so we need to find where the resource
 # class source got placed in the course of building the resources.
@@ -269,6 +275,7 @@ LOCAL_SRC_FILES += \
 	telephony/java/com/android/internal/telephony/IWapPushManager.aidl \
 	wifi/java/android/net/wifi/IWifiManager.aidl \
 	wifi/java/android/net/wifi/p2p/IWifiP2pManager.aidl \
+	ethernet/java/android/net/ethernet/IEthernetManager.aidl \
 	packages/services/PacProcessor/com/android/net/IProxyService.aidl \
 	packages/services/Proxy/com/android/net/IProxyCallback.aidl \
 	packages/services/Proxy/com/android/net/IProxyPortListener.aidl \

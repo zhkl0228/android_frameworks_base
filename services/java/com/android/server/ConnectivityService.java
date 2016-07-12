@@ -50,7 +50,7 @@ import android.database.ContentObserver;
 import android.net.CaptivePortalTracker;
 import android.net.ConnectivityManager;
 import android.net.DummyDataStateTracker;
-import android.net.EthernetDataTracker;
+//import android.net.EthernetDataTracker;
 import android.net.IConnectivityManager;
 import android.net.INetworkManagementEventObserver;
 import android.net.INetworkPolicyListener;
@@ -75,6 +75,8 @@ import android.net.SamplingDataTracker;
 import android.net.Uri;
 import android.net.wifi.WifiStateTracker;
 import android.net.wimax.WimaxManagerConstants;
+import android.net.ethernet.EthernetManager;
+import android.net.ethernet.EthernetStateTracker;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Build;
@@ -621,6 +623,7 @@ public class ConnectivityService extends IConnectivityManager.Stub {
                 && SystemProperties.get("ro.build.type").equals("eng");
 
         // Create and start trackers for hard-coded networks
+        int ethNetworkType = -1;
         for (int targetNetworkType : mPriorityList) {
             final NetworkConfig config = mNetConfigs[targetNetworkType];
             final NetworkStateTracker tracker;
@@ -630,6 +633,14 @@ public class ConnectivityService extends IConnectivityManager.Stub {
             } catch (IllegalArgumentException e) {
                 Slog.e(TAG, "Problem creating " + getNetworkTypeName(targetNetworkType)
                         + " tracker: " + e);
+                continue;
+            }
+
+            if (mNetConfigs[targetNetworkType].radio == ConnectivityManager.TYPE_ETHERNET) {
+                EthernetService ethernet = new EthernetService(context, (EthernetStateTracker)mNetTrackers[targetNetworkType]);
+                ServiceManager.addService(Context.ETH_SERVICE, ethernet);
+                mNetTrackers[targetNetworkType].startMonitoring(context, mTrackerHandler);
+                ethNetworkType = targetNetworkType;
                 continue;
             }
 
@@ -695,6 +706,11 @@ public class ConnectivityService extends IConnectivityManager.Stub {
         filter = new IntentFilter();
         filter.addAction(CONNECTED_TO_PROVISIONING_NETWORK_ACTION);
         mContext.registerReceiver(mProvisioningReceiver, filter);
+
+        if (ethNetworkType != -1) {
+            if (VDBG) log("mNetTrackers[" + ethNetworkType + "].reconnect()");
+            mNetTrackers[ethNetworkType].reconnect();
+        }
     }
 
     /**
@@ -728,7 +744,8 @@ public class ConnectivityService extends IConnectivityManager.Stub {
                 case TYPE_WIMAX:
                     return makeWimaxStateTracker(mContext, mTrackerHandler);
                 case TYPE_ETHERNET:
-                    return EthernetDataTracker.getInstance();
+                    //return EthernetDataTracker.getInstance();
+                    return new EthernetStateTracker(targetNetworkType, config.name);
                 default:
                     throw new IllegalArgumentException(
                             "Trying to create a NetworkStateTracker for an unknown radio type: "
@@ -2530,7 +2547,7 @@ public class ConnectivityService extends IConnectivityManager.Stub {
 
         // Update 464xlat state.
         NetworkStateTracker tracker = mNetTrackers[netType];
-        if (mClat.requiresClat(netType, tracker)) {
+        if (mClat != null && mClat.requiresClat(netType, tracker)) {
 
             // If the connection was previously using clat, but is not using it now, stop the clat
             // daemon. Normally, this happens automatically when the connection disconnects, but if

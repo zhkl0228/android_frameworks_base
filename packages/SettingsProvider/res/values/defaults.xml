@@ -285,7 +285,7 @@
     <!-- Default for Settings.System.SYSTEM_PROFILES_ENABLED -->
     <bool name="def_system_profiles_enabled">true</bool>
 
-		<!-- Default for Settings.System.SYSTEM_PROFILES_ENABLED -->
+		<!-- Default for Settings.Global.CAPTIVE_PORTAL_SERVER -->
 		<string name="def_captive_portal_server">www.g.cn</string>
 
 </resources>

@@ -2964,7 +2964,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             loadDefaultAnimationSettings(stmt);
             // --- New global settings start here
 
-						loadStringSetting(stmt, Settings.Global.CAPTIVE_PORTAL_SERVER, R.string.def_captive_portal_server);
+            loadStringSetting(stmt, Settings.Global.CAPTIVE_PORTAL_SERVER, R.string.def_captive_portal_server);
         } finally {
             if (stmt != null) stmt.close();
         }

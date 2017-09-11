@@ -1054,8 +1054,13 @@ public final class Bundle extends BaseBundle implements Cloneable, Parcelable {
             if (mParcelledData == EMPTY_PARCEL) {
                 return "Bundle[EMPTY_PARCEL]";
             } else {
-                return "Bundle[mParcelledData.dataSize=" +
-                        mParcelledData.dataSize() + "]";
+                try {
+                    Bundle copy = (Bundle) this.clone();
+                    copy.unparcel();
+                    return copy.toString();
+                } catch(Exception ignored) {
+                    return "Bundle[mParcelledData.dataSize=" + mParcelledData.dataSize() + "]";
+                }
             }
         }
         return "Bundle[" + mMap.toString() + "]";

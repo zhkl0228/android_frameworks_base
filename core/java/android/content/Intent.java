@@ -7410,15 +7410,7 @@ public class Intent implements Parcelable, Cloneable {
                 b.append(' ');
             }
             first = false;
-            b.append("(");
-            try {
-              Bundle copy = (Bundle) mExtras.clone();
-              copy.isEmpty(); // unparcel
-              b.append(copy);
-            } catch(Exception ignored) {
-              b.append(mExtras);
-            }
-            b.append(")");
+            b.append("(").append(mExtras).append(")");
         }
         if (mContentUserHint != UserHandle.USER_CURRENT) {
             if (!first) {

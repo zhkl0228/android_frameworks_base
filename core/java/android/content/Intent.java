@@ -8462,7 +8462,7 @@ public class Intent implements Parcelable, Cloneable {
                 b.append(' ');
             }
             first = false;
-            b.append("(has extras)");
+            b.append("(").append(mExtras).append(")");
         }
         if (mContentUserHint != UserHandle.USER_CURRENT) {
             if (!first) {

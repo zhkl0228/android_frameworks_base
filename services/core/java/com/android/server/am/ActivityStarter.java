@@ -256,7 +256,7 @@ class ActivityStarter {
         final int userId = aInfo != null ? UserHandle.getUserId(aInfo.applicationInfo.uid) : 0;
 
         if (err == ActivityManager.START_SUCCESS) {
-            Slog.i(TAG, "START u" + userId + " {" + intent.toShortString(true, true, true, false)
+            Slog.i(TAG, "START u" + userId + " {" + intent.toInsecureStringWithClip()
                     + "} from uid " + callingUid
                     + " on display " + (container == null ? (mSupervisor.mFocusedStack == null ?
                     Display.DEFAULT_DISPLAY : mSupervisor.mFocusedStack.mDisplayId) :

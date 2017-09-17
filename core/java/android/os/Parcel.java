@@ -2290,8 +2290,6 @@ public final class Parcel {
                             "IllegalAccessException when unmarshalling: " + name);
                 }
                 catch (ClassNotFoundException e) {
-                    Log.e(TAG, "Class not found when unmarshalling: "
-                                        + name, e);
                     throw new BadParcelableException(
                             "ClassNotFoundException when unmarshalling: " + name);
                 }

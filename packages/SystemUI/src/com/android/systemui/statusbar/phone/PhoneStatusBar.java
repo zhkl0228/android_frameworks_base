@@ -882,7 +882,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         mNavigationBarView.getRecentsButton().setOnTouchListener(mRecentsPreloadOnTouchListener);
         mNavigationBarView.getHomeButton().setOnTouchListener(mHomeSearchActionListener);
         mNavigationBarView.getSearchLight().setOnTouchListener(mHomeSearchActionListener);
-        mNavigationBarView.getScreenShotButton().setOnClickListener(mScreenshotClickListener);  // add by bill
+        // mNavigationBarView.getScreenShotButton().setOnClickListener(mScreenshotClickListener);  // add by bill
         updateSearchPanel();
     }
 

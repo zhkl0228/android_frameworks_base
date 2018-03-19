@@ -7,19 +7,27 @@
 
 #define LOG_TAG "appproc"
 
-#include <cutils/properties.h>
 #include <binder/IPCThreadState.h>
 #include <binder/ProcessState.h>
 #include <utils/Log.h>
 #include <cutils/process_name.h>
 #include <cutils/memory.h>
-#include <cutils/trace.h>
+#include <cutils/properties.h>
 #include <android_runtime/AndroidRuntime.h>
-#include <sys/personality.h>
+#include <dlfcn.h>
 
-#include <stdlib.h>
+#if PLATFORM_SDK_VERSION >= 16
+#include <sys/personality.h>
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
+#include "xposed.h"
+#include "xposed_safemode.h"
+
+int RUNNING_PLATFORM_SDK_VERSION = 0;
+void (*PTR_atrace_set_tracing_enabled)(bool) = NULL;
+
 
 namespace android {
 
@@ -27,6 +35,25 @@ void app_usage()
 {
     fprintf(stderr,
         "Usage: app_process [java-options] cmd-dir start-class-name [options]\n");
+    fprintf(stderr, "   with Xposed support (version " XPOSED_VERSION ")\n");
+}
+
+void initTypePointers()
+{
+    char sdk[PROPERTY_VALUE_MAX];
+    const char *error;
+
+    property_get("ro.build.version.sdk", sdk, "0");
+    RUNNING_PLATFORM_SDK_VERSION = atoi(sdk);
+
+    dlerror();
+
+    if (RUNNING_PLATFORM_SDK_VERSION >= 18) {
+        *(void **) (&PTR_atrace_set_tracing_enabled) = dlsym(RTLD_DEFAULT, "atrace_set_tracing_enabled");
+        if ((error = dlerror()) != NULL) {
+            ALOGE("Could not find address for function atrace_set_tracing_enabled: %s", error);
+        }
+    }
 }
 
 class AppRuntime : public AndroidRuntime
@@ -56,6 +83,8 @@ public:
 
     virtual void onVmCreated(JNIEnv* env)
     {
+        keepLoadingXposed = xposedOnVmCreated(env, mClassName);
+
         if (mClassName == NULL) {
             return; // Zygote. Nothing to do here.
         }
@@ -97,8 +126,10 @@ public:
 
     virtual void onZygoteInit()
     {
-        // Re-enable tracing now that we're no longer in Zygote.
-        atrace_set_tracing_enabled(true);
+        if (PTR_atrace_set_tracing_enabled != NULL) {
+            // Re-enable tracing now that we're no longer in Zygote.
+            PTR_atrace_set_tracing_enabled(true);
+        }
 
         sp<ProcessState> proc = ProcessState::self();
         ALOGV("App process: starting thread pool.\n");
@@ -137,6 +168,23 @@ static void setArgv0(const char *argv0, const char *newArgv0)
 
 int main(int argc, char* const argv[])
 {
+    if (argc == 2 && strcmp(argv[1], "--xposedversion") == 0) {
+        printf("Xposed version: " XPOSED_VERSION "\n");
+        return 0;
+    }
+
+    if (argc == 2 && strcmp(argv[1], "--xposedtestsafemode") == 0) {
+        printf("Testing Xposed safemode trigger\n");
+
+        if (xposed::detectSafemodeTrigger(xposedSkipSafemodeDelay())) {
+            printf("Safemode triggered\n");
+        } else {
+            printf("Safemode not triggered\n");
+        }
+        return 0;
+    }
+
+#if PLATFORM_SDK_VERSION >= 16
 #ifdef __arm__
     /*
      * b/7188322 - Temporarily revert to the compat memory layout
@@ -163,6 +211,9 @@ int main(int argc, char* const argv[])
     }
     unsetenv("NO_ADDR_COMPAT_LAYOUT_FIXUP");
 #endif
+#endif
+
+    initTypePointers();
 
     // These are global variables in ProcessState.cpp
     mArgC = argc;
@@ -212,22 +263,35 @@ int main(int argc, char* const argv[])
         }
     }
 
+    if (zygote) {
+        if (!xposedDisableSafemode() && xposed::detectSafemodeTrigger(xposedSkipSafemodeDelay()))
+            disableXposed();
+    }
+
     if (niceName && *niceName) {
         setArgv0(argv0, niceName);
         set_process_name(niceName);
     }
 
     runtime.mParentDir = parentDir;
+    
+    if (zygote || access(XPOSED_ENABLE_FOR_TOOLS, F_OK) == 0) {
+        xposedInfo();
+        xposedEnforceDalvik();
+        keepLoadingXposed = !isXposedDisabled() && !xposedShouldIgnoreCommand(className, argc, argv) && addXposedToClasspath(zygote);
+    } else {
+        keepLoadingXposed = false;
+    }
 
     if (zygote) {
-        runtime.start("com.android.internal.os.ZygoteInit",
+        runtime.start(keepLoadingXposed ? XPOSED_CLASS_DOTS : "com.android.internal.os.ZygoteInit",
                 startSystemServer ? "start-system-server" : "");
     } else if (className) {
         // Remainder of args get passed to startup class main()
         runtime.mClassName = className;
         runtime.mArgC = argc - i;
         runtime.mArgV = argv + i;
-        runtime.start("com.android.internal.os.RuntimeInit",
+        runtime.start(keepLoadingXposed ? XPOSED_CLASS_DOTS : "com.android.internal.os.RuntimeInit",
                 application ? "application" : "tool");
     } else {
         fprintf(stderr, "Error: no class name or --zygote supplied.\n");

@@ -2275,6 +2275,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     R.integer.def_low_battery_sound_timeout);
 
             // --- New global settings start here
+
+           loadIntegerSetting(stmt, Settings.Global.ETH_ON, R.integer.def_eth_on);
+           loadStringSetting(stmt, Settings.Global.ETH_IFNAME, R.string.def_eth_ifname);
+           loadIntegerSetting(stmt, Settings.Global.ETH_CONF, R.integer.def_eth_conf);
+           loadStringSetting(stmt, Settings.Global.ETH_MODE, R.string.def_eth_mode);
+           loadIntegerSetting(stmt, Settings.Global.ETH_KEEP, R.integer.def_eth_always_on);
         } finally {
             if (stmt != null) stmt.close();
         }

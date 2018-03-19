@@ -8,7 +8,7 @@
 namespace android {
 
 #define XPOSED_DIR "/data/data/de.robv.android.xposed.installer/"
-#define XPOSED_JAR XPOSED_DIR "bin/XposedBridge.jar"
+#define XPOSED_JAR "/system/framework/XposedBridge.jar"
 #define XPOSED_JAR_NEWVERSION XPOSED_DIR "bin/XposedBridge.jar.newversion"
 #define XPOSED_LOAD_BLOCKER XPOSED_DIR "conf/disabled"
 #define XPOSED_ENABLE_FOR_TOOLS XPOSED_DIR "conf/enable_for_tools"

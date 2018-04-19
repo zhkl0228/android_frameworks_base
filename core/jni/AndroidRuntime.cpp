@@ -800,6 +800,14 @@ char* AndroidRuntime::toSlashClassName(const char* className)
 }
 
 /*
+ * Support xposed
+ */
+void AndroidRuntime::start(const char* className, const char* options)
+{
+    start(className, options, true);
+}
+
+/*
  * Start the Android runtime.  This involves starting the virtual machine
  * and calling the "static void main(String[] args)" method in the class
  * named by "className".

@@ -64,6 +64,7 @@ public:
 
     int addVmArguments(int argc, const char* const argv[]);
 
+    void start(const char *classname, const char* options);
     void start(const char *classname, const char* options, bool zygote);
 
     void exit(int code);
